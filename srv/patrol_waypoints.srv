@@ -1,0 +1,6 @@
+string cmd
+int32 num
+geometry_msgs/Pose2D waypoint
+---
+string response
+geometry_msgs/Pose2D[] waypoint
