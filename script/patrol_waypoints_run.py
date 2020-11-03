@@ -2,8 +2,6 @@
 
 #TODO PREVWP save and load
 
-import itertools
-
 import rospy
 
 from patrol_waypoints.srv import patrol_waypoints, patrol_waypointsResponse, patrol_waypointsRequest
