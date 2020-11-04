@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#TODO PREVWP save and load
+#TODO PREVWP save and load, 
 
 import rospy
 
@@ -13,7 +13,7 @@ class PatrolWaypointsManager():
 
         rospy.init_node('patrol_waypoints_server')
         self.waypoints_list = []
-        self.curentwp = 1
+        self.wpselector = 0
 
         self.patrol_waypoints_server() 
         # NO CODE BEYOND THIS LINE IN INIT
@@ -47,15 +47,14 @@ class PatrolWaypointsManager():
             return resp
 
     
-    def readwp(self, req):
+    def gotowp(self, req):
 
         resp = patrol_waypointsResponse()
         try:
-            rospy.loginfo("Waypoint " + str(req.num) + " has been read")
-            number_of_wp_in_list = req.num
-            self.waypoints_list
-            resp.response = "Waypoint " + str(req.num)
-            resp.waypoint = [self.waypoints_list[number_of_wp_in_list - 1]]
+            rospy.loginfo("Waypoint " + str(req.num) + " to go")
+            resp.response = "Waypoint " + str(req.num) + " to go"
+            resp.waypoint = [self.waypoints_list[req.num - 1]]
+            self.wpselector = req.num
             return resp
         except Exception as err:
             rospy.loginfo(str(err))
@@ -117,13 +116,12 @@ class PatrolWaypointsManager():
         try:
             rospy.loginfo("Next waypoint")
             resp.response = "Next waypoint"
-            if self.curentwp >= len(self.waypoints_list):
-                self.curentwp = 0
-                resp.waypoint = [self.waypoints_list[self.curentwp]]
-                self.curentwp += 1
+            if self.wpselector < len(self.waypoints_list):
+                resp.waypoint = [self.waypoints_list[self.wpselector]]
+                self.wpselector += 1
             else:
-                resp.waypoint = [self.waypoints_list[self.curentwp]]
-                self.curentwp += 1
+                resp.waypoint = [self.waypoints_list[0]]
+                self.wpselector = 1
             return resp
         except Exception as err:
             rospy.loginfo(str(err))
@@ -144,8 +142,8 @@ class PatrolWaypointsManager():
 
         if req.cmd == "add":
             return self.addwp(req)
-        elif req.cmd == "read":
-            return self.readwp(req)
+        elif req.cmd == "goto":
+            return self.gotowp(req)
         elif req.cmd == "update":
             return self.updatewp(req)
         elif req.cmd == "delete":
