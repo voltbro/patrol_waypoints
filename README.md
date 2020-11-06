@@ -6,9 +6,9 @@ The structure of command is:
 cmd "String"
 num "int32"
 Waypoint #Pose2D object
-        x "float64"
-        y "float64"
-        theta "float64"
+x "float64"
+y "float64"
+theta "float64"
 
 cmd "add" appending the waypoint written below to the waypoints list
 if num != "0" adding the waypoint written below to the index equals of num the waypoints list splited in such case
