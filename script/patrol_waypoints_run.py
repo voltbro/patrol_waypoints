@@ -7,7 +7,7 @@ import rospy
 from patrol_waypoints.srv import patrol_waypoints, patrol_waypointsResponse, patrol_waypointsRequest
 from geometry_msgs.msg import Pose2D
 
-# XML parcer lib
+# XML parcer's libs
 import xml.etree.ElementTree as ET
 import copy
 
