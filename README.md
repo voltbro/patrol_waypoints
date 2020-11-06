@@ -3,7 +3,6 @@ Turtlebro patrol waypoints service
 
 commands for service which should been envoked through rosservice call method
 
-add:
 cmd "add" appending the waypoint written below to the waypoints list
 if num != "0" adding the waypoint written below to the index equals of num the waypoints list splited in such case
 
