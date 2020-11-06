@@ -7,10 +7,14 @@ import rospy
 from patrol_waypoints.srv import patrol_waypoints, patrol_waypointsResponse, patrol_waypointsRequest
 from geometry_msgs.msg import Pose2D
 
+# XML parcer lib
+import xml.etree.ElementTree as ET
+import copy
+
 class PatrolWaypointsManager():
+
     
     def __init__(self):
-
         rospy.init_node('patrol_waypoints_server')
         self.waypoints_list = []
         self.wpselector = 0
@@ -18,8 +22,7 @@ class PatrolWaypointsManager():
         self.patrol_waypoints_server() 
         # NO CODE BEYOND THIS LINE IN INIT
         
-    def addwp(self, req):
-
+    def add_wp(self, req):
         resp = patrol_waypointsResponse()
         try:
             rospy.loginfo(req.cmd)
@@ -46,9 +49,7 @@ class PatrolWaypointsManager():
             resp.response = str(err)
             return resp
 
-    
-    def gotowp(self, req):
-
+    def goto_wp(self, req):
         resp = patrol_waypointsResponse()
         try:
             rospy.loginfo("Waypoint " + str(req.num) + " to go")
@@ -60,10 +61,8 @@ class PatrolWaypointsManager():
             rospy.loginfo(str(err))
             resp.response = str(err)
             return resp
-
     
-    def updatewp(self, req):
-
+    def update_wp(self, req):
         resp = patrol_waypointsResponse()
         try:
             rospy.loginfo(req.cmd)
@@ -79,9 +78,7 @@ class PatrolWaypointsManager():
             resp.response = str(err)
             return resp
 
-
-    def deletewp(self, req):
-
+    def delete_wp(self, req):
         resp = patrol_waypointsResponse()
         try:
             rospy.loginfo(req.cmd)
@@ -96,8 +93,7 @@ class PatrolWaypointsManager():
             resp.response = str(err)
             return resp
     
-    def listwp(self, req):
-
+    def list_wp(self, req):
         resp = patrol_waypointsResponse()
         try:
             rospy.loginfo("List of waypoints")
@@ -109,9 +105,7 @@ class PatrolWaypointsManager():
             resp.response = str(err)
             return resp
 
-
-    def nextwp(self, req):
-
+    def next_wp(self, req):
         resp = patrol_waypointsResponse()
         try:
             rospy.loginfo("Next waypoint")
@@ -128,47 +122,89 @@ class PatrolWaypointsManager():
             resp.response = str(err)
             return resp
 
-    #TODO PREVWP save and load
+    def load_wp(self, req):
+        rospy.loginfo("Waypoint file parsing started")
+        resp = patrol_waypointsResponse()
+        wp = Pose2D()
+        try:
+            waypoints_data_file = ('../data/'+ req.cmd.split()[1]) #TODO to point to correct dir
+            tree = ET.parse(waypoints_data_file)
+            root = tree.getroot()
+            i = 0
+            for waypoint in root.findall('waypoint'):
+                wp.x = float(waypoint.get('x'))
+                wp.y = float(waypoint.get('y'))
+                wp.theta = float(waypoint.get('theta'))
+                self.waypoints_list.append(copy.deepcopy(wp))
+            rospy.loginfo(self.waypoints_list)
+            resp.response = "Waypoints file succesfully loaded"
+            rospy.loginfo("Waypoints file succesfully loaded")
+            return resp
+        except Exception as err:
+            rospy.loginfo(str(err))
+            resp.response = str(err)
+            return resp
+
+    def save_wp(self, req):
+        resp = patrol_waypointsResponse()
+        wp = Pose2D()
+        try:
+            waypoints_data_file = ('../data/'+ req.cmd.split()[1]) #TODO to point to correct dir
+            root = ET.Element('data')
+            for i in range(len(self.waypoints_list)):
+                wpt = ET.SubElement(root, 'waypoint')
+                wpt.set("id", str(i))
+                wpt.set("x",str(self.waypoints_list[i].x))
+                wpt.set("y",str(self.waypoints_list[i].y))
+                wpt.set("theta",str(self.waypoints_list[i].theta))
+            
+            tree = ET.ElementTree(root)
+            with open(waypoints_data_file, "w") as f:
+                tree.write(f, encoding="unicode")
+
+            resp.response = "Waypoints file succesfully saved"
+            rospy.loginfo("Waypoints file succesfully saved")
+            return resp
+        except Exception as err:
+            rospy.loginfo(str(err))
+            resp.response = str(err)
+            return resp
 
     def err_req(self, req):
-
         resp = patrol_waypointsResponse()
         rospy.loginfo("cmd not recognized")
         resp.response = "cmd not recognized"
         return resp
-
     
     def request_manager(self, req):
-
         if req.cmd == "add":
-            return self.addwp(req)
+            return self.add_wp(req)
         elif req.cmd == "goto":
-            return self.gotowp(req)
+            return self.goto_wp(req)
         elif req.cmd == "update":
-            return self.updatewp(req)
+            return self.update_wp(req)
         elif req.cmd == "delete":
-            return self.deletewp(req)
+            return self.delete_wp(req)
         elif req.cmd == "next":
-            return self.nextwp(req)
+            return self.next_wp(req)
         elif req.cmd == "prev":
-            return self.prevwp(req)    
+            return self.prev_wp(req)    
         elif req.cmd == "list":
-            return self.listwp(req)
+            return self.list_wp(req)
         elif req.cmd == "home":
-            return self.homewp(req)
-        elif req.cmd == "save":
-            return self.homewp(req)
-        elif req.cmd == "load":
-            return self.homewp(req)
+            return self.home_wp(req)
+        elif req.cmd.split()[0] == "save":
+            return self.save_wp(req)
+        elif req.cmd.split()[0] == "load":
+            return self.load_wp(req)
         else:
             return self.err_req(req)
 
-
     def patrol_waypoints_server(self):
-
         s = rospy.Service('patrol_waypoints', patrol_waypoints, self.request_manager)
         rospy.loginfo("Ready to manage waypoints")
         rospy.spin()
+
 
 if __name__ == "__main__":
     PatrolWaypointsManager()
