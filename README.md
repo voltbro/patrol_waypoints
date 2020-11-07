@@ -1,39 +1,47 @@
 # patrol_waypoints
 Turtlebro patrol waypoints service
-===========
-Install
-===========
+
+
+# Installation
+```sh
 cd catkin_ws/src/
 git clone https://github.com/voltbro/patrol_waypoints.git
 cd ..
 catkin_make --pkg=patrol_waypoints
-
+```
+```sh
 cd catkin_ws/src/patrolwaypoints/scripts/
 sudo chmod +x patrol_waypoints_run.py
-===========
-Run
-===========
-roslaunch patrol_waypoints patrol_waypoints.launch
+```
 
-===========
-Operate
-===========
+
+# Run
+
+```sh
+roslaunch patrol_waypoints patrol_waypoints.launch
+```
+
+# Operate
+
+
 Commands for service which should been envoked through rosservice call method.
 The structure of command is as follow:
 cmd "String"
 num "int32"
-Waypoint #Pose2D object
+Waypoint: Pose2D object
 x "float64"
 y "float64"
 theta "float64"
 
 example:
+```sh
 rosservice call /patrol_waypoints "cmd: 'add'
 num: '2'
 waypoint:
     x: '1.0'
     y: '2.1'
     theta: '90'"
+```
 This exapmle will add waypoint with coordinates x 1.0 y 2.1 and left turn by 90 degrees to the second place in list if exist or append it to the end of the list if no 2nd waypoint exist yet
 
 
@@ -56,12 +64,14 @@ cmd "goto" returns single Pose2D object - waypoint from waypoint list with index
 
 cmd "save filename" saves XML file with waypoints list into /data/ folder
 example:
+```sh
 rosservice call /patrol_waypoints "cmd: 'save goals.xml'
 num: ''
 waypoint
     x: ''
     y: ''
     theta: ''"
+```
 
 cmd "load filename" loads XML file with waypoints lists and appends it to existing waypoints list from /data/ folder
 
