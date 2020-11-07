@@ -1,6 +1,23 @@
 # patrol_waypoints
 Turtlebro patrol waypoints service
+===========
+Install
+===========
+cd catkin_ws/src/
+git clone https://github.com/voltbro/patrol_waypoints.git
+cd ..
+catkin_make --pkg=patrol_waypoints
 
+cd catkin_ws/src/patrolwaypoints/scripts/
+sudo chmod +x patrol_waypoints_run.py
+===========
+Run
+===========
+roslaunch patrol_waypoints patrol_waypoints.launch
+
+===========
+Operate
+===========
 Commands for service which should been envoked through rosservice call method.
 The structure of command is as follow:
 cmd "String"
