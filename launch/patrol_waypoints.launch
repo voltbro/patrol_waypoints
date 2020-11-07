@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="patrol_waypoints" type="script/patrol_waypoints_run.py" name="patrol_waypoints_srv" output="log" respawn="false"/>
+</launch>
