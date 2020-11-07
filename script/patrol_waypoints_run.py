@@ -3,6 +3,7 @@
 #TODO PREVWP save and load, 
 
 import rospy
+import rospkg
 
 from patrol_waypoints.srv import patrol_waypoints, patrol_waypointsResponse, patrol_waypointsRequest
 from geometry_msgs.msg import Pose2D
@@ -16,6 +17,7 @@ class PatrolWaypointsManager():
     
     def __init__(self):
         rospy.init_node('patrol_waypoints_server')
+        self.rospack = rospkg.RosPack()
         self.waypoints_list = []
         self.curent_wp = -1
 
@@ -165,7 +167,8 @@ class PatrolWaypointsManager():
         resp = patrol_waypointsResponse()
         wp = Pose2D()
         try:
-            waypoints_data_file = ('../data/'+ req.cmd.split()[1]) #TODO to point to correct dir
+            waypoints_data_file = self.rospack.get_path('patrol_waypoints') + "/data/" + req.cmd.split()[1]
+            #waypoints_data_file = ('../data/'+ req.cmd.split()[1]) #TODO to point to correct dir
             root = ET.Element('data')
             for i in range(len(self.waypoints_list)):
                 wpt = ET.SubElement(root, 'waypoint')
@@ -191,7 +194,8 @@ class PatrolWaypointsManager():
         resp = patrol_waypointsResponse()
         wp = Pose2D()
         try:
-            waypoints_data_file = ('../data/'+ req.cmd.split()[1]) #TODO to point to correct dir
+            waypoints_data_file = self.rospack.get_path('patrol_waypoints') + "/data/" + req.cmd.split()[1]
+            #waypoints_data_file = ('../data/'+ req.cmd.split()[1]) #TODO to point to correct dir
             tree = ET.parse(waypoints_data_file)
             root = tree.getroot()
             i = 0
