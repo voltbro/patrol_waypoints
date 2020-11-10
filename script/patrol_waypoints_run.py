@@ -45,7 +45,8 @@ class PatrolWaypointsManager():
                 first_part_of_wp_list.append(wp)
                 first_part_of_wp_list.extend(second_part_of_wp_list)
                 self.waypoints_list = first_part_of_wp_list
-                resp.response = "Waypoint" + str(req.num) + "added"
+                rospy.loginfo("Waypoint " + str(req.num) + " added")
+                resp.response = "Waypoint " + str(req.num) + " added"
             resp.waypoint = [wp]
             return resp
         except Exception as err:
@@ -73,7 +74,8 @@ class PatrolWaypointsManager():
             rospy.loginfo(req.num)
             rospy.loginfo(req.waypoint)
             wp = req.waypoint
-            self.waypoints_list[req.num - 1] = wp   
+            self.waypoints_list[req.num - 1] = wp
+            rospy.loginfo("Waypoint " + str(req.num) + " updated")
             resp.response = "Waypoint " + str(req.num) + " updated"
             resp.waypoint = [wp]
             return resp
@@ -89,6 +91,7 @@ class PatrolWaypointsManager():
             rospy.loginfo(req.num)
             rospy.loginfo(req.waypoint)
             wp = self.waypoints_list.pop(req.num - 1)   
+            rospy.loginfo("Waypoint " + str(req.num) + " deleted")
             resp.response = "Waypoint " + str(req.num) + " deleted"
             resp.waypoint = [wp]
             return resp
@@ -168,7 +171,6 @@ class PatrolWaypointsManager():
         wp = Pose2D()
         try:
             waypoints_data_file = self.rospack.get_path('patrol_waypoints') + "/data/" + req.cmd.split()[1]
-            #waypoints_data_file = ('../data/'+ req.cmd.split()[1]) #TODO to point to correct dir
             root = ET.Element('data')
             for i in range(len(self.waypoints_list)):
                 wpt = ET.SubElement(root, 'waypoint')
@@ -196,7 +198,6 @@ class PatrolWaypointsManager():
         wp = Pose2D()
         try:
             waypoints_data_file = self.rospack.get_path('patrol_waypoints') + "/data/" + req.cmd.split()[1]
-            #waypoints_data_file = ('../data/'+ req.cmd.split()[1]) #TODO to point to correct dir
             tree = ET.parse(waypoints_data_file)
             root = tree.getroot()
         
